@@ -26,7 +26,9 @@ node index.js
 If successful, you should see something similar to:
 
 ```bash
-requestID: 2486
-request result: [object Object]
-matching result: [object Object]
+🚀 Submitting a new request
+Request Result:  { kraken_goldx_price: 60508348n, ibit_golx_price: 60416075n }
+----------------------------------------------------------------------------------------------------
+⏳ Fetching the latest request that match specified parameters
+Last Matching Request Result:  { kraken_goldx_price: 60508348n, ibit_golx_price: 60416075n }
 ```
