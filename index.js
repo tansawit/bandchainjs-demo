@@ -1,36 +1,52 @@
+const { Obi } = require('@bandprotocol/obi.js');
 const BandChain = require('@bandprotocol/bandchain.js');
 
-// Declare variables needed
-// NOTE: chainID will be retrievable from a function in the next update to solve the issue of having
-// to manually update following the devnet upgrade every two weeks
-const chainID = 'band-guanyu-devnet-2.5';
+// BandChain Devnet REST endpoint
 const endpoint = 'http://guanyu-devnet.bandchain.org/rest';
+// Mnemonic to use to make requests
 const mnemonic =
   'final little loud vicious door hope differ lucky alpha morning clog oval milk repair off course indicate stumble remove nest position journey throw crane';
 
+// Declare the variables
+// Note: Requests made using the devnet explorer (https://guanyu-devnet.cosmoscan.io) is set to use minCount = 4 and askCount = 4
+// minCount: the minimum number of BandChain's validators that responds for us to consider the request successful
+// askCount: the maximum number of validators that we want to respond to the request
+minCount = 4;
+askCount = 4;
+
 (async () => {
-  let oracleScriptID = 1;
-  let bandchain = new BandChain(chainID, endpoint);
+  // PAXG Price oracle script ID
+  let oracleScriptID = 67;
+
+  // Initiate `BandChain` object to be used when making requests
+  let bandchain = new BandChain(endpoint);
+
+  // Get oracle script info
   let oracleScript = await bandchain.getOracleScript(oracleScriptID);
+
+  const obi = new Obi(oracleScript.schema);
 
   // Submit a request transaction
   let requestID = await bandchain.submitRequestTx(
     oracleScript,
-    { symbol: 'BTC', multiplier: BigInt('1000000') },
-    { minCount: 2, askCount: 4 },
+    { multiplier: BigInt('1000000') },
+    { minCount: 4, askCount: 4 },
     mnemonic
   );
   console.log('requestID: ' + requestID);
 
   // Retrieve the previous request's results
   let requestResult = await bandchain.getRequestResult(requestID);
-  console.log('request result: ' + requestResult);
+  // Decode and print the result
+  let encodedOutput = requestResult.ResponsePacketData['result'];
+  let decodedOutput = obi.decodeOutput(Buffer.from(encodedOutput, 'base64'));
+  console.log('Request Result', decodedOutput);
 
   // Asking for a request with the previously requested parameters
   let matchingResult = await bandchain.getLastMatchingRequestResult(
     oracleScript,
-    { symbol: 'BTC', multiplier: BigInt('1000000') },
-    { minCount: 2, askCount: 4 }
+    { multiplier: BigInt('1000000') },
+    { minCount: 4, askCount: 4 }
   );
-  console.log('matching result: ' + matchingResult);
+  console.log('Last Matching Request Result', matchingResult['result']);
 })();

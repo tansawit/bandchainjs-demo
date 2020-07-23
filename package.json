@@ -10,7 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "@babel/runtime": "^7.10.3",
-    "@bandprotocol/bandchain.js": "^1.0.13",
+    "@bandprotocol/bandchain.js": "^1.0.21",
+    "@bandprotocol/obi.js": "^1.0.7",
     "delay": "^4.3.0"
   }
 }
