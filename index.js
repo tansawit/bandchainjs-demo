@@ -27,26 +27,28 @@ askCount = 4;
   const obi = new Obi(oracleScript.schema);
 
   // Submit a request transaction
+  console.log('🚀 Submitting a new request');
   let requestID = await bandchain.submitRequestTx(
     oracleScript,
     { multiplier: BigInt('1000000') },
     { minCount: 4, askCount: 4 },
     mnemonic
   );
-  console.log('requestID: ' + requestID);
-
   // Retrieve the previous request's results
   let requestResult = await bandchain.getRequestResult(requestID);
   // Decode and print the result
   let encodedOutput = requestResult.ResponsePacketData['result'];
   let decodedOutput = obi.decodeOutput(Buffer.from(encodedOutput, 'base64'));
-  console.log('Request Result', decodedOutput);
+  console.log('Request Result: ', decodedOutput);
+
+  console.log('-'.repeat(100));
 
   // Asking for a request with the previously requested parameters
+  console.log('⏳ Fetching the latest request that match specified parameters');
   let matchingResult = await bandchain.getLastMatchingRequestResult(
     oracleScript,
     { multiplier: BigInt('1000000') },
     { minCount: 4, askCount: 4 }
   );
-  console.log('Last Matching Request Result', matchingResult['result']);
+  console.log('Last Matching Request Result: ', matchingResult['result']);
 })();
